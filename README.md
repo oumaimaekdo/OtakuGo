@@ -30,50 +30,47 @@ Le concept repose sur un fonctionnement **mobile-first**, entièrement **local**
 
 ##  **Fonctionnalités principales**
 
-###  Recommandation adaptative
+L'application s'articule autour de 5 modules principaux :
 
-L’utilisateur choisit entre deux animes. L’application apprend et affine ses recommandations en fonction :
+### 1. Swipe
+Système de swipe (inspiré de Tinder) pour découvrir des animes.
 
-* des genres,
-* des thèmes,
-* des catégories démographiques (Shounen, Seinen, etc.).
+### 2. Algorithme évolutif
+* **Filtrage :** Quiz dès le début pour cibler les genres préférés pour une recommendation personnalisée.
+* **Recommandation hybride :** 80% des choix de l'utilisateur et 20% de découverte.
 
-###  Base de données locale
+### 3. Coffre (Favoris)
+Liste complète des animes "likés" avec accès aux fiches détaillées.
 
-Les animes proviennent d’un dataset Kaggle comportant :
-`anime_id, image_url, name, english_name, score, genres, themes, demographics, synopsis, episodes, rating`
+### 4. Tier List & Classement
+Interface de **Drag & Drop** pour organiser ses animes favoris par rang (S, A, B, C, D, Z). Les nouveaux likes arrivent dans une zone tampon "À classer".
 
-Le JSON est stocké localement dans `/assets/`.
+### 5. Mode Tournoi
+Génération de duels entre les animes favoris pour déterminer le "Champion" de l'utilisateur.
 
-###  Affichage visuel moderne
-
-* Cartes d’animés avec :
-  image,
-  nom,
-  genres
-* Style sombre inspiré des plateformes otaku (Netflix, MAL, Crunchyroll).
-
-###  Chargement optimisé
-
-* Utilisation de `cached_network_image` pour charger et **mettre en cache** les images.
-* Affichage rapide + support hors-ligne après premier affichage.
+### 6. Dashboard (Stats)
+Visualisation des données utilisateur :
+* Répartition des genres préférés (Shonen, Seinen, etc.).
+* Statistiques d'utilisation (ratio de likes/dislikes).
 
 ---
 
 ##  **Technologies utilisées**
-
-| Domaine                | Technologie          |
-| ---------------------- | -------------------- |
-| Framework              | **Flutter**          |
-| Langage                | **Dart**             |
-| Gestion UI             | Material Design      |
-| Cache des images       | cached_network_image |
-| Base de données locale | JSON (assets)        |
-| Plateforme             | Android              |
+| Technologies | Usage dans le projet |
+| :--- | :--- |
+| **Flutter & Dart** | Développement cross-platform. |
+| **Provider** | Gestion d'état (State Management) pour centraliser les données. |
+| **Shared Preferences** | Persistance des données (sauvegarde locale). |
+| **Just Audio** | Gestion du player audio pour l'ambiance sonore. |
+| **Assets JSON** | Base de données locale pour garantir le mode hors-ligne. |
 
 ---
 
 ##  **Installation et exécution**
+
+### Prérequis
+* **Flutter SDK** installé (version stable).
+* Un émulateur Android/iOS ou un appareil physique connecté.
 
 ### 1️ Cloner le projet
 
@@ -81,42 +78,45 @@ Le JSON est stocké localement dans `/assets/`.
 git clone https://github.com/votre-repo/otakugo.git
 cd otakugo
 ```
+Cette commande télécharge tout le code source dans le dossier otakugo et vous place à l'intérieur.
 
 ### 2️ Installer les dépendances Flutter
 
 ```bash
 flutter pub get
 ```
+Cette commande permet de télécharger toutes les librairies nécessaires (listées dans pubspec.yaml) :
 
 ### 3️ Exécuter sur un appareil ou un émulateur Android
 
 ```bash
 flutter run
 ```
+Cette commande construit l'APK (Android) et l'installe. Le premier lancement peut prendre quelques minutes.
 
 ---
 
 ##  **Aperçu**
 
-(à ajouter plus tard si vous voulez des captures d’écran)
+## 📸 Aperçu de l'application
+
+**1. Prise en main et Découverte**
+
+| Quiz (Début) | Tuto Accueil | Page Découverte |
+|:---:|:---:|:---:|
+| <img src="./screenshots_readme/quiz.png" width="200"> | <img src="./screenshots_readme/tutoAcceuil2.png" width="200"> | <img src="./screenshots_readme/Decouverte.png" width="200"> |
+
+**2. Fonctionnalités et Profil**
+
+| Mode Tournoi | Coffre (Favoris) | Page Profil |
+|:---:|:---:|:---:|
+| <img src="./screenshots_readme/Tournoi.png" width="250"> | <img src="./screenshots_readme/Coffret.png" width="250"> | <img src="./screenshots_readme/Profil.png" width="250"> |
+
 
 ---
 
-##  **Défis rencontrés**
+### 🎌 Prêt à découvrir votre prochain banger ?
 
-* Fichier JSON volumineux nécessitant nettoyage (`NaN`, valeurs manquantes).
-* Optimisation du parsing (gestion des nulls, valeurs incohérentes).
-* Mise en cache de milliers d’images pour un affichage fluide.
-* Structuration d’une interface propre et scalable.
+> **Go trouver ton animé avec OtakuGo !**
 
----
-
-##  **Améliorations futures**
-
-* Ajout d’un vrai système de recommandation (pondération multi-genres).
-* Page de détails complète pour chaque anime.
-* Mode 100 % hors-ligne (préchargement total des images).
-* Filtrage par genres / thèmes.
-* Animation lors du choix entre deux animes.
-
----
+Merci de l'intérêt porté à notre projet SAE. N'hésitez pas à cloner le repo et à tester l'application !

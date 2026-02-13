@@ -35,7 +35,10 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   provider: ^6.1.2
-  shared_preferences: ^2.2.2
+  shared_preferences: ^2.5.4
+  just_audio: ^0.9.36
+  share_plus: ^12.0.1
+  palette_generator: ^0.3.3+4
 
 dev_dependencies:
   flutter_test:
@@ -52,7 +55,7 @@ dev_dependencies:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/icon/icon.png"
+  image_path: "assets/icon/Logo.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
 
 
@@ -64,6 +67,8 @@ flutter:
   assets:
     - assets/images_raw/
     - assets/anime_1000.json
+    - assets/audio/
+    - assets/icon/
   
 
 

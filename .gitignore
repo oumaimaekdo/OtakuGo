@@ -18,3 +18,8 @@ ios/Flutter/Flutter.podspec
 # VS Code / IntelliJ / autres
 .vscode/
 .idea/
+
+
+.metadata
+hs_err_pid*.log
+replay_pid*.log

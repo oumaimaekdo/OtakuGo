@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../state/anime_controller.dart';
 import '../models/anime.dart';
 import '../widgets/anime_details_dialog.dart';
-import '../widgets/treasure_chest_icon.dart';
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({super.key});
@@ -26,6 +25,11 @@ class _FavoritesPageState extends State<FavoritesPage> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AnimeController>();
+    final isDark = controller.isDarkMode;
+    final bgColor = isDark ? const Color(0xFF17171F) : const Color(0xFFF2E8D5);
+    final cardColor = isDark ? const Color(0xFF252836) : const Color(0xFFFAF6ED);
+    final textColor = isDark ? Colors.white : Colors.black87;
+    
     final favorites = controller.favorites;
     
     // Extract all unique genres from favorites
@@ -37,7 +41,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
     }
     final sortedGenres = allGenres.toList()..sort();
 
-    // Filter favorites (AND logic: show if anime has ALL selected genres)
+    // Filter favorites
     var filteredFavorites = _selectedGenres.isEmpty
         ? favorites
         : favorites.where((a) => _selectedGenres.every((tag) => a.tags.contains(tag))).toList();
@@ -50,139 +54,188 @@ class _FavoritesPageState extends State<FavoritesPage> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: const [
-            TreasureChestIcon(size: 28, color: Colors.black87),
-            SizedBox(width: 8),
-            Text(
-              'Mon Coffre-Fort',
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Column(
-        children: [
-          // Search Bar
-          if (favorites.isNotEmpty)
-            Container(
-              padding: const EdgeInsets.all(16),
-              color: Colors.white,
-              child: TextField(
-                controller: _searchController,
-                onChanged: (value) {
-                  setState(() => _searchQuery = value);
-                },
-                decoration: InputDecoration(
-                  hintText: 'Rechercher un anime...',
-                  prefixIcon: const Icon(Icons.search, color: Color(0xFF6C5DD3)),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear, color: Colors.grey),
-                          onPressed: () {
-                            setState(() {
-                              _searchController.clear();
-                              _searchQuery = '';
-                            });
-                          },
-                        )
-                      : null,
-                  filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFF6C5DD3), width: 2),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                ),
-              ),
-            ),
-          
-          // Genre Filter
-          if (favorites.isNotEmpty)
-            Container(
-              height: 60,
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              color: Colors.white,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+      backgroundColor: bgColor,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Unified Header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildFilterChip('Tout', _selectedGenres.isEmpty, () {
-                    setState(() => _selectedGenres.clear());
-                  }),
-                  ...sortedGenres.map((genre) => _buildFilterChip(
-                    genre,
-                    _selectedGenres.contains(genre),
-                    () {
-                      setState(() {
-                        if (_selectedGenres.contains(genre)) {
-                          _selectedGenres.remove(genre);
-                        } else {
-                          _selectedGenres.add(genre);
-                        }
-                      });
-                    },
-                  )),
+                  // Back & Logo
+                  Row(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: cardColor,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: IconButton(
+                          icon: Icon(Icons.arrow_back_rounded, color: textColor),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Image.asset(
+                        isDark ? 'assets/icon/logo-otaku-Header-Black.png' : 'assets/icon/logo-otaku-Header.png',
+                        height: 28,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Text(
+                            'OtakuGo',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 22,
+                              color: textColor,
+                              letterSpacing: -0.5,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  // Dark mode toggle
+                  Container(
+                    decoration: BoxDecoration(
+                      color: cardColor,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                        color: textColor,
+                        size: 22,
+                      ),
+                      onPressed: controller.toggleTheme,
+                    ),
+                  ),
                 ],
               ),
             ),
 
-          // Favorites List
-          Expanded(
-            child: favorites.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.favorite_border, size: 64, color: Colors.grey[400]),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Aucun favori pour le moment',
-                          style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                        ),
-                      ],
+            // Search Bar
+            if (favorites.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (value) {
+                    setState(() => _searchQuery = value);
+                  },
+                  style: TextStyle(color: textColor),
+                  decoration: InputDecoration(
+                    hintText: 'Rechercher un anime...',
+                    hintStyle: TextStyle(color: textColor.withOpacity(0.5)),
+                    prefixIcon: Icon(Icons.search, color: const Color(0xFF6C5DD3)),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: Icon(Icons.clear, color: textColor.withOpacity(0.5)),
+                            onPressed: () {
+                              setState(() {
+                                _searchController.clear();
+                                _searchQuery = '';
+                              });
+                            },
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: cardColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
                     ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: filteredFavorites.length,
-                    itemBuilder: (context, index) {
-                      final anime = filteredFavorites[index];
-                      return _buildFavoriteCard(anime, controller);
-                    },
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: const BorderSide(color: Color(0xFF6C5DD3), width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   ),
-          ),
-        ],
+                ),
+              ),
+          
+            // Genre Filter
+            if (favorites.isNotEmpty)
+              Container(
+                height: 56,
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  children: [
+                    _buildFilterChip('Tout', _selectedGenres.isEmpty, cardColor, textColor, () {
+                      setState(() => _selectedGenres.clear());
+                    }),
+                    ...sortedGenres.map((genre) => _buildFilterChip(
+                      genre,
+                      _selectedGenres.contains(genre),
+                      cardColor,
+                      textColor,
+                      () {
+                        setState(() {
+                          if (_selectedGenres.contains(genre)) {
+                            _selectedGenres.remove(genre);
+                          } else {
+                            _selectedGenres.add(genre);
+                          }
+                        });
+                      },
+                    )),
+                  ],
+                ),
+              ),
+
+            // Favorites List
+            Expanded(
+              child: favorites.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.favorite_border, size: 64, color: textColor.withOpacity(0.3)),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Aucun favori pour le moment',
+                            style: TextStyle(fontSize: 16, color: textColor.withOpacity(0.6)),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+                      itemCount: filteredFavorites.length,
+                      itemBuilder: (context, index) {
+                        final anime = filteredFavorites[index];
+                        return _buildFavoriteCard(anime, controller, cardColor, textColor);
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildFilterChip(String label, bool isSelected, VoidCallback onTap) {
+  Widget _buildFilterChip(String label, bool isSelected, Color cardColor, Color textColor, VoidCallback onTap) {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: FilterChip(
         label: Text(label),
         selected: isSelected,
         onSelected: (_) => onTap(),
-        backgroundColor: Colors.grey[100],
+        backgroundColor: cardColor,
         selectedColor: const Color(0xFF6C5DD3).withOpacity(0.2),
         labelStyle: TextStyle(
-          color: isSelected ? const Color(0xFF6C5DD3) : Colors.black87,
+          color: isSelected ? const Color(0xFF6C5DD3) : textColor,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          fontSize: 13,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -195,7 +248,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
     );
   }
 
-  Widget _buildFavoriteCard(Anime anime, AnimeController controller) {
+  Widget _buildFavoriteCard(Anime anime, AnimeController controller, Color cardColor, Color textColor) {
     return GestureDetector(
       onTap: () {
         showDialog(
@@ -204,14 +257,14 @@ class _FavoritesPageState extends State<FavoritesPage> {
         );
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
+        margin: const EdgeInsets.only(bottom: 14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: cardColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 12,
               offset: const Offset(0, 4),
             ),
           ],
@@ -225,12 +278,12 @@ class _FavoritesPageState extends State<FavoritesPage> {
                 child: Image.asset(
                   anime.image,
                   width: 100,
-                  height: 140,
+                  height: 130,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       width: 100,
-                      height: 140,
+                      height: 130,
                       color: Colors.grey[300],
                       child: const Icon(Icons.broken_image, color: Colors.grey),
                     );
@@ -246,10 +299,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
                   children: [
                     Text(
                       anime.title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1F1D2B),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: textColor,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -258,34 +311,37 @@ class _FavoritesPageState extends State<FavoritesPage> {
                     Wrap(
                       spacing: 4,
                       runSpacing: 4,
-                      children: anime.tags.take(3).map((tag) => Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF4F2FB),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          tag,
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: Color(0xFF6C5DD3),
-                            fontWeight: FontWeight.w600,
+                      children: anime.tags.take(3).map((tag) {
+                        final tagColor = _getGenreColor(tag);
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: tagColor.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(6),
                           ),
-                        ),
-                      )).toList(),
+                          child: Text(
+                            tag,
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: tagColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        );
+                      }).toList(),
                     ),
                   ],
                 ),
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+              icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
               onPressed: () {
                 showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
-                    title: const Text("Supprimer des favoris ?"),
-                    content: Text("Voulez-vous vraiment supprimer \"${anime.title}\" de vos favoris ?"),
+                    title: const Text("Supprimer du coffre-fort ?"),
+                    content: Text("Voulez-vous vraiment supprimer \"${anime.title}\" de votre coffre-fort ?"),
                     actions: [
                       TextButton(
                         child: const Text("Annuler", style: TextStyle(color: Colors.black54)),
@@ -308,5 +364,19 @@ class _FavoritesPageState extends State<FavoritesPage> {
         ),
       ),
     );
+  }
+
+  Color _getGenreColor(String genre) {
+    final g = genre.toLowerCase();
+    if (g.contains('action')) return const Color(0xFFEF4444);
+    if (g.contains('adventure')) return const Color(0xFF3B82F6);
+    if (g.contains('comedy')) return const Color(0xFFF59E0B);
+    if (g.contains('drama')) return const Color(0xFF8B5CF6);
+    if (g.contains('fantasy')) return const Color(0xFF10B981);
+    if (g.contains('romance')) return const Color(0xFFEC4899);
+    if (g.contains('sci-fi')) return const Color(0xFF06B6D4);
+    if (g.contains('mystery')) return const Color(0xFF6366F1);
+    if (g.contains('supernatural')) return const Color(0xFF7C3AED);
+    return const Color(0xFF6C5DD3);
   }
 }
