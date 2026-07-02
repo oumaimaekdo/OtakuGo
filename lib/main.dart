@@ -100,6 +100,17 @@ class OtakuGoApp extends StatelessWidget {
           theme: lightTheme,
           darkTheme: darkTheme,
           themeMode: controller.themeMode,
+          builder: (context, child) {
+            return Container(
+              color: const Color(0xFF17171F),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 430),
+                  child: child!,
+                ),
+              ),
+            );
+          },
           home: const SplashScreen(
             nextScreen: MainScreen(),
             duration: Duration(seconds: 3),
