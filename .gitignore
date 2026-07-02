@@ -23,3 +23,6 @@ ios/Flutter/Flutter.podspec
 .metadata
 hs_err_pid*.log
 replay_pid*.log
+
+.idea/
+*.iml
