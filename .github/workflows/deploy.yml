@@ -1,4 +1,4 @@
-﻿name: Deploy web demo
+name: Deploy web demo
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
           channel: stable
 
       - name: Build web
-        run: flutter build web --release --base-href "/otakugo/"
+        run: flutter build web --release --base-href "/OtakuGo/"
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
